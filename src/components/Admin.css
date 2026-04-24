@@ -1,0 +1,76 @@
+.admin-container {
+  padding: 20px;
+  background-color: #f5f7fa;
+}
+
+/* Title */
+.admin-container h1 {
+  text-align: center;
+  color: #222;
+  margin-bottom: 20px;
+}
+
+/* Stats section */
+.stats {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+/* Individual stat cards */
+.card {
+  flex: 1;
+  background: #ffffff;
+  color: #333;
+  padding: 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Search box */
+.search-box {
+  width: 100%;
+  padding: 10px;
+  margin: 15px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+/* Table container */
+.table-container {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow-x: auto;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Header */
+th {
+  background: #007bff;
+  color: white;
+  padding: 12px;
+}
+
+/* Table cells */
+td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  color: #333;
+}
+
+/* Hover effect */
+tr:hover {
+  background: #f1f1f1;
+}
