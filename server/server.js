@@ -17,7 +17,7 @@ app.use(express.json());
 // 🔌 MongoDB Connection
 // ======================
 mongoose.connect(
-  "mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/ticketdb?retryWrites=true&w=majority"
+  "mongodb+srv://venkateshgurajala416_db_user:edSb2vxmFEFYb3ev@cluster0.9xludiz.mongodb.net/ticketdb?retryWrites=true&w=majority"
 )
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log("MongoDB Error:", err));
