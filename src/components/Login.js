@@ -15,7 +15,7 @@ export default function Login() {
     }
 
     try {
-      await axios.post("http://localhost:5000/login", { email, password });
+      await axios.post("https://ticket-booking-app-f1kr.onrender.com/api/login", { email, password });
 
       localStorage.setItem("userEmail", email);
 

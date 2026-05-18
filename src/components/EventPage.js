@@ -10,7 +10,7 @@ export default function EventPage() {
   const [availableTickets, setAvailableTickets] = useState(0);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/remaining-tickets")
+    axios.get("https://ticket-booking-app-f1kr.onrender.com/api/remaining-tickets")
       .then(res => setAvailableTickets(res.data.remaining))
       .catch(err => console.log(err));
   }, []);
