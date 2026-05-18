@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import axios from "axios";
 
 export default function BookingForm({
-  event, availableTickets, setAvailableTickets, setBookingData
+  event,
+  availableTickets,
+  setAvailableTickets,
+  setBookingData
 }) {
   const [form, setForm] = useState({
     name: "",
@@ -10,75 +13,205 @@ export default function BookingForm({
     department: "",
     tickets: ""
   });
+
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) =>
+  // 🔄 Handle input
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
+  // ✅ Validation
   const validate = () => {
     if (!form.name || !form.email || !form.department || !form.tickets) {
       return "All fields are required";
     }
-    if (!/\S+@\S+\.\S+/.test(form.email)) return "Invalid email";
-    if (Number(form.tickets) <= 0) return "Tickets must be > 0";
-    if (Number(form.tickets) > availableTickets) return "Not enough tickets";
+
+    if (!/\S+@\S+\.\S+/.test(form.email)) {
+      return "Invalid email format";
+    }
+
+    if (Number(form.tickets) <= 0) {
+      return "Tickets must be greater than 0";
+    }
+
+    if (Number(form.tickets) > availableTickets) {
+      return "Not enough tickets available";
+    }
+
     return "";
   };
 
- const handlePayment = async () => {
-  const err = validate();
-  if (err) return setError(err);
+  // 💳 Booking function
+  const handlePayment = async () => {
+    const err = validate();
+    if (err) {
+      setError(err);
+      setSuccess("");
+      return;
+    }
 
-  const total = Number(form.tickets) * event.price;
+    setError("");
+    setSuccess("");
+    setLoading(true);
 
-  // 💳 Fake payment success
-  alert("Payment Successful ✅");
+    const total = Number(form.tickets) * event.price;
 
-  try {
-    await axios.post("http://localhost:5000/book", {
-      ...form,
-      total,
-      paid: true
-    });
+    try {
+      const res = await axios.post("http://localhost:5000/book", {
+        name: form.name,
+        email: form.email,
+        department: form.department,
+        tickets: Number(form.tickets),
+        total,
+        paid: true
+      });
 
-    // update tickets
-    const remaining = availableTickets - Number(form.tickets);
-    setAvailableTickets(remaining);
+      console.log("RESPONSE:", res.data);
 
-    // show summary
-    setBookingData({
-      ...form,
-      eventName: event.name,
-      total
-    });
+      // ✅ Success handling
+      if (res.status === 200) {
 
-    // reset form
-    setForm({
-      name: "",
-      email: form.email,
-      department: "",
-      tickets: ""
-    });
+        // Update tickets
+        setAvailableTickets(prev => prev - Number(form.tickets));
 
-  } catch (e) {
-    setError("Booking failed");
-  }
-};
+        // Show summary (if used)
+        if (setBookingData) {
+          setBookingData({
+            ...form,
+            eventName: event.name,
+            total
+          });
+        }
+
+        // Reset form
+        setForm({
+          name: "",
+          email: form.email,
+          department: "",
+          tickets: ""
+        });
+
+        setSuccess("Booking successful 🎉");
+      }
+
+    } catch (e) {
+      console.log("ERROR:", e.response?.data);
+
+      setError(
+        e.response?.data?.message ||
+        e.response?.data?.error ||
+        "Booking failed"
+      );
+      setSuccess("");
+    }
+
+    setLoading(false);
+  };
 
   return (
-    <div className="card">
-      <h2>Book Tickets</h2>
-      {error && <p className="error">{error}</p>}
+    <div style={styles.card} className="mt-4">
 
-      <form >
-        <input name="name" placeholder="Name" value={form.name} onChange={handleChange}/>
-        <input name="email" placeholder="Email" value={form.email} onChange={handleChange}/>
-        <input name="department" placeholder="Department" value={form.department} onChange={handleChange}/>
-        <input name="tickets" type="number" placeholder="Tickets" value={form.tickets} onChange={handleChange}/>
-        <button type="button" onClick={handlePayment}>
-  Pay & Book
-</button>
-      </form>
+      <h3 className="text-center mb-3" style={{ fontWeight: "bold" }}>
+        🎟️ Book Tickets
+      </h3>
+
+      {/* ❌ ERROR */}
+      {error && (
+        <p className="text-center" style={{ color: "red", fontWeight: "500" }}>
+          {error}
+        </p>
+      )}
+
+      {/* ✅ SUCCESS */}
+      {success && (
+        <p className="text-center" style={{ color: "green", fontWeight: "600" }}>
+          {success}
+        </p>
+      )}
+
+      {/* INPUTS */}
+      <input
+        className="form-control mb-3"
+        name="name"
+        placeholder="👤 Enter Name"
+        value={form.name}
+        onChange={handleChange}
+        style={styles.input}
+      />
+
+      <input
+        className="form-control mb-3"
+        name="email"
+        placeholder="📧 Enter Email"
+        value={form.email}
+        onChange={handleChange}
+        style={styles.input}
+      />
+
+      <input
+        className="form-control mb-3"
+        name="department"
+        placeholder="🏫 Enter Department"
+        value={form.department}
+        onChange={handleChange}
+        style={styles.input}
+      />
+
+      <input
+        className="form-control mb-4"
+        type="number"
+        name="tickets"
+        placeholder="🎫 Number of Tickets"
+        value={form.tickets}
+        onChange={handleChange}
+        style={styles.input}
+      />
+
+      {/* BUTTON */}
+      <button
+        className="btn w-100"
+        onClick={handlePayment}
+        disabled={loading}
+        style={styles.button}
+      >
+        {loading ? "Processing..." : "Pay & Book"}
+      </button>
+
+      {/* AVAILABLE */}
+      <p className="text-center mt-3" style={{ fontWeight: "bold" }}>
+        Available Tickets: {availableTickets}
+      </p>
+
     </div>
   );
 }
+
+// 🎨 STYLES
+const styles = {
+  card: {
+    borderRadius: "15px",
+    padding: "25px",
+    background: "rgba(255,255,255,0.9)",
+    backdropFilter: "blur(10px)",
+    boxShadow: "0 8px 25px rgba(0,0,0,0.3)"
+  },
+
+  input: {
+    borderRadius: "10px",
+    padding: "10px",
+    border: "1px solid #ddd"
+  },
+
+  button: {
+    borderRadius: "10px",
+    padding: "12px",
+    fontWeight: "bold",
+    background: "linear-gradient(45deg, #ff7e5f, #feb47b)",
+    border: "none",
+    color: "white",
+    transition: "0.3s"
+  }
+};

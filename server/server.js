@@ -25,7 +25,9 @@ mongoose.connect("mongodb://127.0.0.1:27017/ticketDB")
 // 📧 Email Transporter
 // ======================
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL,
     pass: process.env.PASS
@@ -77,7 +79,8 @@ app.post("/book", async (req, res) => {
     tickets = Number(tickets);
     total = Number(total);
 
-const TOTAL = global.TOTAL_TICKETS || 100;
+const event = await Event.findOne();
+const TOTAL = event?.totalTickets || 100;
 
     // 🔒 Check already booked tickets
     const totalBooked = await Booking.aggregate([
@@ -104,10 +107,12 @@ const TOTAL = global.TOTAL_TICKETS || 100;
       paid: true
     });
 
-    await booking.save();
+  await booking.save();
+console.log("✅ Booking saved:", booking);
 
     // 📧 Email
     try {
+      console.log("📧 Sending email to:", email);
       await transporter.sendMail({
         from: process.env.EMAIL,
         to: email,
@@ -123,9 +128,9 @@ Name: ${name}
 Tickets: ${tickets}
 Total Amount: ₹${total}`
       });
-    } catch (err) {
-      console.log("⚠️ Email failed but booking saved");
-    }
+    }catch (err) {
+  console.log("❌ Email Error:", err);
+}
 
     res.json({ message: "Booking successful" });
 
