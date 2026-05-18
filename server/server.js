@@ -16,9 +16,11 @@ app.use(express.json());
 // ======================
 // 🔌 MongoDB Connection
 // ======================
-mongoose.connect("mongodb://127.0.0.1:27017/ticketDB")
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.log("❌ MongoDB Error:", err));
+mongoose.connect(
+  "mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/ticketdb?retryWrites=true&w=majority"
+)
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log("MongoDB Error:", err));
 
 
 // ======================
